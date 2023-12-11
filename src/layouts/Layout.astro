@@ -5,8 +5,8 @@ interface Props {
 }
 
 const { title } = Astro.props;
-const data = Astro.locals
-const currentUser = data.user
+const locals = Astro.locals
+const currentUser = locals.user
 ---
 
 <!doctype html>
@@ -24,9 +24,9 @@ const currentUser = data.user
 		<nav>
 			<a href="/">Home</a>
 			<a href="/about">About</a>
-			<a href="/auth/signup">Sign up</a>
-			<a href="/auth/login">Log In</a>
-			{currentUser & <a href="/auth/profile">Profile</a> }
+			{!currentUser && <a href="/auth/signup">Sign up</a>}
+			{!currentUser && <a href="/auth/login">Log In</a> }
+			{currentUser && <a href="/auth/profile">Profile</a> }
 		</nav>
 		<slot />
 	</body>
@@ -45,7 +45,7 @@ const currentUser = data.user
 	}
 	html {
 		font-family: system-ui, sans-serif;
-		background: #13151a;
+		background: #edeef1;
 		background-size: 224px;
 	}
 	code {

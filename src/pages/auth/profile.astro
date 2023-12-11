@@ -1,8 +1,8 @@
 ---
 import Layout from '../../layouts/Layout.astro'
 const pageTitle = "Home Page"
-const data = Astro.locals
-const currentUser = data.user
+const locals = Astro.locals
+const currentUser = locals.user
 ---
 <Layout title={pageTitle}>
     <section>
@@ -14,9 +14,8 @@ const currentUser = data.user
            
         </div>
         
-        <!-- <div>
-            <pre>{JSON.stringify(data.user, 2, null)}</pre>
-            
-        </div> -->
+        <div>
+            <pre>{JSON.stringify(locals.user, 2, null)}</pre>            
+        </div>
     </section>
 </Layout>
