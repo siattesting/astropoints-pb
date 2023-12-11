@@ -1,0 +1,22 @@
+---
+import Layout from '../../layouts/Layout.astro'
+const pageTitle = "Home Page"
+const data = Astro.locals
+const currentUser = data.user
+---
+<Layout title={pageTitle}>
+    <section>
+        <div>
+            {currentUser && <h2>Welcome {currentUser.email}!</h2>}
+            <br />
+            <a href="/auth/logout">Logout</a>
+            <p>Cum beatae reiciendis reprehenderit cupiditate, nam distinctio placeat necessitatibus dolores perspiciatis quae id aliquam laudantium exercitationem facilis odit iusto culpa modi voluptatibus qui rem sapiente ullam? Enim neque voluptate, veniam </p>
+           
+        </div>
+        
+        <!-- <div>
+            <pre>{JSON.stringify(data.user, 2, null)}</pre>
+            
+        </div> -->
+    </section>
+</Layout>

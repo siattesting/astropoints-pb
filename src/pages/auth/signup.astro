@@ -1,0 +1,101 @@
+---
+import Layout from "../../layouts/Layout.astro"
+const pageTitle = "Registration page"
+
+
+import { validateEmail } from '../../lib/utils.js'
+const locals = Astro.locals
+
+const errors = { username: "", email: "", password: "", passwordConfirm: ""}
+const hasErrors = Object.values(errors).some(msg => msg)
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData()
+        const username = data.get("username")
+        const email = data.get("email")
+        const password = data.get("password")
+        const passwordConfirm = data.get("passwordConfirm")
+        if (typeof username !== "string" || username.length < 3) {
+            errors.username += "Please enter a username of at least 3 characters ";
+        }
+        if (typeof email !== "string" || !validateEmail(email)) {
+            errors.email += "Please enter a valid email such as example@domain.com. ";
+        }
+        if (typeof password !== "string" || password.length < 6) {
+            errors.password += "Passwords must be at leat 6 characters long ";
+        }
+        if (typeof passwordConfirm !== "string" || passwordConfirm !== password) {
+            errors.passwordConfirm += "Passwords and confrimation password must macth ";
+        }
+        // const hasErrors = Object.values(errors).some(msg => msg)
+        if (!hasErrors) {
+            // Try register the user
+            try {
+                await locals.pb.collection('users').create({email, password, passwordConfirm})
+                // await POCKET.collection('users').create(email, password)
+            } catch (e) {
+                console.error(e.message)
+                throw e
+            }
+
+            //redirect to login page
+            return Astro.redirect("/auth/login")
+
+        }
+        
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        }
+    }
+}
+---
+<Layout pageTitle={pageTitle}>
+    <div class="box">
+    <h2>{pageTitle}</h2>
+        <form method="POST" class="form">
+            <div class="field">
+                <label for="username" class="label">Username:
+                    <input type="text" class="input" name="username" required minlength="3" />
+                </label>
+                {errors.username && <span class="help error">{errors.username}</span>}
+            </div>
+            <div class="field">
+                <label for="email" class="label">Email:
+                    <input type="email" class="input" name="email" required />
+                </label>
+                {errors.email && <span class="help error">{errors.email}</span>}
+            </div>
+            <div class="field">
+                <label for="password" class="label">Password:
+                    <input type="password" class="input" name="password" required minlength="6" />
+                </label>
+                {errors.password && <span class="help error">{errors.password}</span>}
+            </div>
+            <div class="field">
+                <label for="passwordConfirm" class="label">Confirm Password:
+                    <input type="password" class="input" name="passwordConfirm" required minlength="6" />
+                </label>
+                {errors.passwordConfirm && <span class="help error">{errors.passwordConfirm}</span>}
+            </div>
+            <div class="field is-grouped">
+  <div class="control">
+    <button class="button is-link" type="submit" disabled={hasErrors}>Submit</button>
+  </div>
+  <div class="control">
+    <button class="button is-link is-light" >Cancel</button>
+  </div>
+</div>
+        </form>
+        <hr />
+        <p>Already have an account ? <a href="/auth/login">Login</a></p>
+    </div>
+</Layout>
+
+<style>
+    .error {
+        color: tomato;
+        font-weight: bold;
+    }
+  
+</style>

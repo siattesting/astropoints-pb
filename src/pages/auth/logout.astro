@@ -1,0 +1,34 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { POCKET } from '../../service//PocketBase.ts'
+const pageTitle = "Logout Page"
+const locals = Astro.locals
+if (Astro.request.method === "POST") {
+    try {
+        await locals.pb.authStore.clear();
+        
+        
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        }
+    }
+    return Astro.redirect('/')
+}
+---
+<Layout title={pageTitle}>
+
+<div>
+    <form method="POST">
+        <input type="submit" value="Logout" />
+    </form>
+    
+</div>
+</Layout>
+
+<style>
+    .error {
+        color: tomato;
+        font-weight: bold;
+    }
+</style>

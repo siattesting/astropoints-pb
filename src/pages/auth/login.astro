@@ -1,0 +1,79 @@
+---
+import Layout from '../../layouts/Layout.astro'
+import { POCKET } from '../../service//PocketBase.ts'
+import { validateEmail } from '../../lib/utils.js'
+
+const pageTitle = "Login Page"
+const locals = Astro.locals
+
+const errors = { username: "", email: "", password: ""}
+const hasErrors = Object.values(errors).some(msg => msg)
+if (Astro.request.method === "POST") {
+    try {
+        const data = await Astro.request.formData()
+        const email = data.get("email")
+        const password = data.get("password")
+
+        if (typeof email !== "string" || !validateEmail(email)) {
+            errors.email += "Please enter a valid email such as example@domain.com. ";
+        }
+        if (typeof password !== "string" || password.length < 6) {
+            errors.password += "Passwords must be at leat 6 characters long ";
+        }
+
+        if (!hasErrors) {
+            // Do something with the form data
+            // Try logging in the user
+            try {
+                const { token, record } = await locals.pb.collection('users').authWithPassword( email, password)
+           
+
+            } catch (e) {
+                console.error(e.message)
+                throw e
+            }
+
+            //redirect to home page
+            return Astro.redirect("/")
+
+        }
+        
+    } catch (error) {
+        if (error instanceof Error) {
+            console.error(error.message);
+        }
+    }
+}
+---
+<Layout title={pageTitle}>
+    <div class="row">
+    <h2>{pageTitle}</h2>
+        <form method="POST" class="form">
+
+            <div class="form-field">
+                <label for="email">Email:
+                    <input type="email" name="email" required />
+                </label>
+                {errors.email && <span class="error">{errors.email}</span>}
+            </div>
+            <div class="form-field">
+                <label for="password">Password:
+                    <input type="password" name="password" required minlength="6" />
+                </label>
+                {errors.password && <span class="error">{errors.password}</span>}
+            </div>
+
+            <input type="submit" value="Submit" disabled={hasErrors} />
+        </form>
+         <hr />
+        <p>Not yet registered? <a href="/auth/signup">Create an account</a></p>
+    </div>
+</Layout>
+
+<style>
+    .error {
+        color: tomato;
+        font-weight: bold;
+    }
+    
+</style>
